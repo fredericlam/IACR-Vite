@@ -2,6 +2,8 @@
 
 	<HelloWorld msg="The International Association of Cancer Registries (IACR)" />
 
+	<p>This is a ViteJS projeect, deployed to Heroku, using heroku pipeline </p>
+
 </template>
 
 <script>
