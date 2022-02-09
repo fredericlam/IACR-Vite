@@ -1,0 +1,36 @@
+<template>
+  <ul class="nav">
+    <li v-for="nav in navigation">
+      <router-link :to="nav.route">{{ nav.label }}</router-link>
+    </li>
+  </ul>
+  
+</template>
+
+<script setup>
+import { ref } from 'vue'
+
+defineProps({
+  navigation: Array
+})
+
+const navigation = [
+  { route : '/' , label : 'Home' },
+  { route : 'about' , label : 'About' },
+  { route : 'contact' , label : 'Contact' }
+] ; 
+
+</script>
+
+<style lang="scss">
+a{
+  color: #2c3e50 ; 
+}
+.nav{
+  li{
+    padding: 20px; 
+    list-style-type: none ; 
+    display: inline ;
+  }
+}
+</style>
