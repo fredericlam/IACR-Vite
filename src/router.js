@@ -16,6 +16,18 @@ const routes = [
     meta: { breadcrumb: [ { name: 'about' } ] }
   },
   {
+    path: '/registries',
+    name: 'registries',
+    component: () => import('./pages/Registries.vue') , 
+    meta: { breadcrumb: [ { name: 'registries' } ] }
+  },
+  {
+    path: '/registries/:registry_slug/:population_id',
+    name: 'registry_sheet',
+    component: () => import('./pages/Registry.vue') , 
+    meta: { breadcrumb: [ { name: 'registry' } ] }
+  },
+  {
     path: '/contact',
     name: 'contact',
     component: () => import('./pages/Contact.vue') , 

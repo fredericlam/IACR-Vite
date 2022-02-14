@@ -3,28 +3,62 @@
 // Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import Navigation from './components/Navigation.vue' ;
 
+
 </script>
 
 <template>
   
-  <img alt="IACR" src="./assets/logo-iacr.png" />
-  
+  <header>
+    <div class="container-md">
+      <img alt="IACR" src="./assets/logo-iacr.png" />
+    </div>
 
-  <Navigation />
-  <router-view />
+  </header>
+
+  <main class="page-content container-md">
+    
+    <Navigation />
+
+    <router-view />
+
+  </main>
+
+  <footer>
+
+  </footer>
 
 </template>
 
-<style>
+<style lang="scss">
 #app {
   font-family: "Source Sans Pro", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 60px;
-  padding: 0 ;
-  max-width: 1280px;
-  margin: auto;
+
+  header{
+    background: #0d3453 ; 
+    max-height: 80px;
+    img{ 
+      max-height: 80px;
+    }
+  }
+
+  h1,h2,h3,h4,h5{
+    font-weight: 700;
+  }
+
+  .row+.row {
+    margin-top: 1.4rem;
+  }
+
+  main.page-content{
+    text-align: left ; 
+    p{
+
+    }
+  }
+
 }
 </style>

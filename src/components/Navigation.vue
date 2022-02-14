@@ -1,5 +1,5 @@
 <template>
-  <ul class="nav">
+  <ul class="nav" id="main-nav">
     <li v-for="nav in navigation">
       <router-link :to="nav.route">{{ nav.label }}</router-link>
     </li>
@@ -17,6 +17,7 @@ defineProps({
 const navigation = [
   { route : '/' , label : 'Home' },
   { route : 'about' , label : 'About' },
+  { route : 'registries' , label : 'Registries' },
   { route : 'contact' , label : 'Contact' }
 ] ; 
 
@@ -26,7 +27,7 @@ const navigation = [
 a{
   color: #2c3e50 ; 
 }
-.nav{
+.nav#main-nav{
   li{
     padding: 20px; 
     list-style-type: none ; 

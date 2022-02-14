@@ -1,9 +1,9 @@
 <template>
 
-	<HelloWorld msg="The International Association of Cancer Registries (IACR)" />
-
 	<p>This is a ViteJS project, deployed to Heroku, using heroku pipeline. </p>
 
+	<HelloWorld msg="The International Association of Cancer Registries (IACR)" />
+	
 </template>
 
 <script>
