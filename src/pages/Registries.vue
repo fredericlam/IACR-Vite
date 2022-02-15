@@ -5,30 +5,28 @@
 		<table class="table" cellpadding="0" cellspacing="0">
 			
 			<thead>
-				<th scope="col">Code</th>
+				<th scope="col">Country</th>
 				<th scope="col">Population</th>
-				<th scope="col">Area</th>
-				<th scope="col" class="marker">Incidence</th>
+				<!--<th scope="col" class="marker">Incidence</th>
 				<th scope="col" class="marker">Mortality</th>
-				<th scope="col" class="marker">Prevalence</th>
+				<th scope="col" class="marker">Prevalence</th>-->
 				<th scope="col">Link</th>
-				<th scope="col">Order</th>
+				<!--<th scope="col">Order</th>-->
 			</thead>
 
 			<tbody>
 				<tr v-for="(registry,i) in registries">
-					<td>{{ registry.country }}</td>
+					<td class="country_grouped">{{ registry.country_grouped }}</td>
 					<td><router-link :to="registry.route">{{ registry.label }}</router-link></td>
-					<td>{{ registry.area_label }}</td>
-					<td class="marker center"><Available :available="registry.incidence" /></td>
+					<!--<td class="marker center"><Available :available="registry.incidence" /></td>
 					<td class="marker center"><Available :available="registry.mortality" /></td>
-					<td class="marker center"><Available :available="registry.prevalence" /></td>
+					<td class="marker center"><Available :available="registry.prevalence" /></td>-->
 					<td>
 						<router-link :to="registry.route">
-							<Http aria-label="Open link"/>
+							<Http aria-label="Open link"/> {{ registry.route }}
 						</router-link>
 					</td>
-					<td>{{ registry.order }}</td>
+					<!--<td>{{ registry.order }}</td>-->
 				</tr>
 			</tbody>
 
@@ -75,10 +73,19 @@ export default {
 		    .then(response => response.json())
 		    .then(registries =>{
 
+		    	let showns = [] ; 
 		    	this.registries = registries.map((r)=>{
-		    		r.route = `/registries/${Func.slugify(r.label)}/${r.country}/`; 
+		    		r.route = `/registries/${Func.slugify(r.label)}/${r.country}/`;
+		    		r.country_grouped = '' ; 
+		    		if ( !showns.includes(r.grouping) ) {
+		    			r.country_grouped = r.grouping 
+		    			showns.push(r.grouping) ; 
+		    		}
 		    		return r ; 
 		    	}) ; 
+
+
+		    	console.table( this.registries ) ; 
 		       
     		});
 	},
@@ -126,4 +133,9 @@ table#table_regitries_list{
 		color: #002060;
 	}
 }
+
+td.country_grouped{
+	font-weight: 900;
+}
+
 </style>

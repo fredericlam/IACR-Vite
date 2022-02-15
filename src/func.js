@@ -29,5 +29,5 @@ export default {
 		}
 		strAccentsOut = strAccentsOut.join('');
 		return strAccentsOut;
-	}
+	}, 
 }

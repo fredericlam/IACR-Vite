@@ -17,7 +17,8 @@ defineProps({
 const navigation = [
   { route : '/' , label : 'Home' },
   { route : 'about' , label : 'About' },
-  { route : 'registries' , label : 'Registries' },
+  { route : 'registries' , label : 'Registries list' },
+  { route : 'registries-map' , label : 'Registries map' },
   { route : 'contact' , label : 'Contact' }
 ] ; 
 

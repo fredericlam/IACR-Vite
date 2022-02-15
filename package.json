@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@carbon/icons-vue": "^10.45.0",
+    "axios": "^0.26.0",
     "sass": "^1.49.7",
     "vue": "^3.2.25",
     "vue-router": "^4.0.12",

@@ -36,7 +36,7 @@ import Navigation from './components/Navigation.vue' ;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-
+  
   header{
     background: #0d3453 ; 
     max-height: 80px;

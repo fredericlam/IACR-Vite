@@ -22,6 +22,12 @@ const routes = [
     meta: { breadcrumb: [ { name: 'registries' } ] }
   },
   {
+    path: '/registries-map',
+    name: 'registries-map',
+    component: () => import('./components/RegistriesMap.vue') , 
+    meta: { breadcrumb: [ { name: 'registries-map' } ] }
+  },
+  {
     path: '/registries/:registry_slug/:population_id',
     name: 'registry_sheet',
     component: () => import('./pages/Registry.vue') , 

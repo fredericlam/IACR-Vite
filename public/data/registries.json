@@ -417,7 +417,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#6fa7ba",
-    "order": 63
+    "order": 63 , 
+    "geo" : { "lat" : 48.6343172 , "lng" : 7.5252938 }
   },
   {
     "country": 25000200,
@@ -431,7 +432,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#cae27e",
-    "order": 64
+    "order": 64 , 
+    "geo" : { "lat" : 49.1213315, "lng" : -0.4330578 }
   },
   {
     "country": 25000400,
@@ -445,7 +447,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#825353",
-    "order": 65
+    "order": 65 , 
+    "geo" : { "lat" : 46.933331, "lng" : 6.35 }
   },
   {
     "country": 25000500,
@@ -459,7 +462,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#d1fcee",
-    "order": 66
+    "order": 66  , 
+    "geo" : { "lat" : 47.9315041, "lng" : 7.2441099 }
   },
   {
     "country": 25000600,
@@ -473,7 +477,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#86c7ca",
-    "order": 67
+    "order": 67  , 
+    "geo" : { "lat" : 50.134664 , "lng" : -0.357056 }
   },
   {
     "country": 25000700,
@@ -487,7 +492,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#fab024",
-    "order": 68
+    "order": 68 , 
+    "geo" : { "lat" : 43.5912356 , "lng" : 3.2583626 }
   },
   {
     "country": 25000800,
@@ -501,7 +507,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#815a78",
-    "order": 69
+    "order": 69 , 
+    "geo" : { "lat" : 44.9957745 , "lng" : 5.9293476 }
   },
   {
     "country": 25001200,
@@ -515,7 +522,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#2b2471",
-    "order": 70
+    "order": 70 , 
+    "geo" : { "lat" : 49.914518 , "lng" : 2.2707095 }
   },
   {
     "country": 25001400,
@@ -529,7 +537,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#56fdf3",
-    "order": 71
+    "order": 71 , 
+    "geo" : { "lat" : 47.2780468 , "lng" : -1.8157647 }
   },
   {
     "country": 25009100,
@@ -543,7 +552,8 @@
     "area_code": "17",
     "grouping": "France",
     "color": "#2CA02C",
-    "order": 7
+    "order": 7 , 
+    "geo" : { "lat" : 14.635540500000001 , "lng" : -61.02281400000001 }
   },
   {
     "country": 27600200,

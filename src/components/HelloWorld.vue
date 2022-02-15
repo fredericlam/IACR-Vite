@@ -11,7 +11,20 @@ const count = ref(0)
 <template>
   <h1>{{ msg }}</h1>
 
-  <p>
+  <div class="row">
+
+    <div class="col">
+      <img alt="IACR" class="img-fluid" src="../assets/img/IACR-1.png" />
+    </div>
+
+    <div class="col">
+      <img alt="IACR" class="img-fluid" src="../assets/img/IACR-2.png" />
+    </div>
+
+  </div>
+
+
+  <!--<p>
     Recommended IDE setup:
     <a href="https://code.visualstudio.com/" target="_blank">VSCode</a>
     +
@@ -30,7 +43,8 @@ const count = ref(0)
   <p>
     Edit
     <code>components/HelloWorld.vue</code> to test hot module replacement.
-  </p>
+  </p>-->
+  
 </template>
 
 <style scoped>
