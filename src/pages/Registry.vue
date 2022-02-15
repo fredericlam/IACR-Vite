@@ -182,7 +182,8 @@ export default {
     		chapter_two : {},
     		path : `http://gcodev.nanga.iarc.lan/media/iacr/report/`,
     		ext : 'png' , 
-    		left_navigation : [] 
+    		left_navigation : [] , 
+    		waypoints : []
     	}
 	},
 	created(){	
@@ -272,14 +273,23 @@ export default {
 		       		}
 		       	}); 
 
-		       	if ( document.location.hash != '' ) {
-		       		
-		       		setTimeout(()=>{
-		       			
-		       			this.clickListGroup(document.location.hash,true) ; 
+		       	setTimeout(()=>{
+			       	this.left_navigation.forEach( n => {
+			       		// console.info("===>",n) ; 
+			       		let waypoint = new Waypoint({
+				          element: $(`#${n.id}`),
+				          handler: ()=> {
+				            this.manageClassList(`${n.id}`)
+				          }
+				        })
+			       		this.waypoints.push( waypoint ) ; 
+			       	}) ;
+			    },2000); 
 
-		       		},1500)
-		       		
+		       	if ( document.location.hash != '' ) {
+		       		setTimeout(()=>{
+		       			this.clickListGroup(document.location.hash,true) ; 
+		       		},1500)		       		
 		       	}
 
     		});
@@ -313,7 +323,7 @@ export default {
 	      	this.manageClassList(bloc) ; 
 	    	
 	      	if (scroll==true){
-	      		$("html, body").animate({ scrollTop: $(`#${bloc}`).offset().top }, 1000 );
+	      		$("html, body").animate({ scrollTop: $(`#${bloc}`).offset().top }, 0 );
 	      	}
 	    },
 	    /**
@@ -325,6 +335,8 @@ export default {
 	      
 	      $('.list-group li.list-group-item').removeClass('active') ; 
 	      $(`a[href="#${bloc}"]`).parent().addClass('active') ; 
+
+	      this.$router.push({ hash : `#${bloc}` }) ; 
 
 	    } 
   	}
