@@ -5,7 +5,8 @@
 		<div :class="{ 'col-md-9': (hide_selector==false) , 'col' : (hide_selector==true) }">
 			<div class="card">
 	    		<div class="card-body">
-	    			<h2 class="card-title" v-if="registry_target.label">{{ registry_target.label }} <span class="badge bg-info text-dark coordinates">[{{ registry_target.geo.lat }},{{ registry_target.geo.lng }}]</span></h2>
+	    			<h2 class="card-title" v-if="registry_target.label">{{ registry_target.label }} 
+	    				<span class="badge bg-info text-dark coordinates" v-if="not_found==false">[{{ registry_target.geo.lat }},{{ registry_target.geo.lng }}]</span></h2>
 	    			<p class="card-text">
 						<div id="container-map"></div>
 					</p>
@@ -36,6 +37,27 @@
 					</p>
 				</div>
 			</div>
+			<br/>
+			<div class="card">
+	    		<div class="card-body">
+	    			<p class="card-text">
+	    				<ul class="list-group" id="registry-info" v-if="not_found==false">
+						  <li class="list-group-item">
+						  	<Http aria-label="Link to report"/><a :href="registry_target.url" target="_blank">See details</a>
+						  </li>
+						  <li class="list-group-item">
+						  	<Word aria-label="Download report"/><a :href="registry_target.report" target="_blank">Download report</a>
+						  </li>
+						  <li class="list-group-item"><Flag/>{{ registry_target.grouping }}</li>
+						  <li class="list-group-item"><Location/>{{ registry_target.area_label }}</li>
+						</ul>
+						<div class="alert alert-danger text-center" role="alert" v-if="not_found==true">
+							Localisation for {{ registry_target.label }} has not been set
+						</div>
+	    			</p>
+	    		</div>
+	    	</div>
+
 		</div>
 
 	</div>
@@ -48,6 +70,10 @@ import axios from 'axios'
 import { useStore } from 'vuex' ;
 import { CarbonIconsVue } from '@carbon/icons-vue';
 import Http from '@carbon/icons-vue/es/http/16';
+import Word from '@carbon/icons-vue/es/document--word-processor/16'; 
+import Flag from '@carbon/icons-vue/es/flag--filled/16'; 
+import Location from '@carbon/icons-vue/es/location--company--filled/16'; 
+
 import Available from '../components/Available.vue' ;
 import Func from '../func.js' ;
 
@@ -60,8 +86,9 @@ export default {
 		height : { type: Number, default: 800 },
 		scale : { type: Number, default: 380 },
 		hide_selector : { type: Boolean , default: false },
+		select_registry : { type : Number , default : 25000800 }
 	},
-	components : { Available , Http } , 
+	components : { Available , Http , Word , Flag , Location } , 
 	setup(){ 
 		// console.info("A setup") ;
 		onMounted(() => {
@@ -75,6 +102,8 @@ export default {
 	},
 	data() {
     	return {
+
+    		path_medias : `http://gcodev.nanga.iarc.lan/media/iacr/report/`,
     		
     		world 	: {} , 
     		land 	: {} ,
@@ -93,6 +122,7 @@ export default {
     		projection : {} , 
     		context : {} , 
     		path : {}, 
+    		tooltip : {} ,
 
     		registries : [] , 
     		points : [] ,
@@ -101,7 +131,9 @@ export default {
 
     		// values
     		registry_target : {} , 
-    		select_registry : 25000800
+
+    		not_found : false 
+    		// select_registry : 25000800
     	}
 	},
 	created(){	
@@ -133,11 +165,13 @@ export default {
 					.scale(this.scale)
 					.rotate([0, 0])
 					.translate([ this.width / 2, this.height / 2])
-					.clipAngle(90)
+					// .clipAngle(90)
+					.clipAngle(100 + 1e-6)
+					.precision(.3) 
 					//.fitExtent([[10, 10], [this.width - 10, this.eight - 10]], this.sphere)
 				;
 
-				this.projection__ = d3.geoMercator()
+				this.projection__ = d3.geoNaturalEarth1()
 				    .center([0, 5 ])
 				    .scale(150)
 				    .rotate([-180,0]);
@@ -154,15 +188,17 @@ export default {
     				.attr("width", this.width)
     				.attr("height", this.height) ;
 
+    			this.tooltip = d3.select('#container-map') 
+		          	.append('div')
+		          	.attr('id','map-tooltip')                             
+		          	.attr('class', 'd3-tooltip'); 
+
     			this.svg.append("path")
 				  .datum({type: "Sphere"})
 				  .attr("class", "water")
 				  .attr("d", this.path);
 
 			 	this.g = this.svg.append('g').attr('class','group_countries') ; 
-
-    			//console.table(this.countries); 
-    			//return ;
 
     			this.g.selectAll("path")
 			       	.data(this.countries)
@@ -180,25 +216,57 @@ export default {
 
 			    this.registries = registries_promise.data ;
 
+			    // console.info(this.countries,this.registries); 
+    			//return ;
+
+			    // find centroid for each registry
+			    // 3 cases
+			    // - coordinates are mentionned into json
+			    // - coordinates are deduced from cities
+			    // - coordinates are set from centroid 
+
 			    this.registries.map((r)=>{
 
-		    		if ( r.geo != undefined ) this.points.push(r) ; 
+		    		if ( r.geo != undefined ){
+		    			this.points.push({
+			  				id  : r.country , 
+			  				label : r.label ,
+			  				geo : { lat : r.geo.lat , lng : r.geo.lng },
+			  				tooltip : [{ label : 'X' , value : 'Y' }]
+			  			})
+		    		}
+		    		else { //if ( r.geo == undefined ){
 
-		    		let geo = { lat : 0 , lng : 0 } ; 
-		    		r.geo = ( r.geo == undefined ) ? geo : r.geo ; 
+		    			// get centroid of country 
+		    			let country = this.countries.find(c=>c.properties.name==r.grouping);
+		    			if ( country != undefined ){
+		    				let geo = d3.geoCentroid( country ) ;
 
+		    				//console.info("geo",r.grouping,geo);
+		    				this.points.push({
+				  				id  : r.country , 
+				  				label : r.label ,
+				  				geo : { lat : geo[1] , lng : geo[0] },
+				  				tooltip : [{ label : 'X' , value : 'Y' }]
+				  			})
+				  			r.geo = { lat : geo[1] , lng : geo[0] } ; 
+		    			}
+		    		}
+
+		    		// let geo = { lat : 0 , lng : 0 } ; 
 		    		return r; 
 		    	})
     			
     			this.svg_circles = this.svg.append('g').attr('class','group_circle') ; 
 		    	
 		    	this.svg_circles
-                    .selectAll('circle.reg')
+                    .selectAll('circle.registry')
                     .data( this.points )
                     .enter()
                     .append('circle')
-                    .attr('class','reg')
-                    .attr('id',(d)=>`circle-${d.country}`)
+                    .attr('class','registry')
+                    .attr('label',d=>d.label)
+                    .attr('id',(d)=>`circle-${d.id}`)
                     .attr("r", 0)
                     .attr("cx", (d)=>{
                         if ( d.geo != undefined )
@@ -213,11 +281,44 @@ export default {
                         }
                     })
                     .attr("fill","#33CC33")
+                    .attr("fill-opacity",1)
                     .attr("stroke","#cccccc")
+                    .attr("stroke-width","0.6px")
                     .transition()
                     .duration(1250)
-                    .delay((_, i)=>{ return i * 50; })
+                    //.delay((_, i)=>{ return i * 50; })
                     .attr("r", 5)
+                
+                this.svg_circles
+                	.selectAll('circle.registry')
+                    .on("mousemove",(event,d)=>{
+                    	// console.info(event,d) ; 
+
+                    	// this.tooltip.html(" ")
+                    	this.tooltip.style('display','block');
+
+                    	let default_tooltip_content = `
+                    		<h5>${d.label}</h5>
+                    		<table>
+                    			<tr>
+                    				<td class="metric"></td>
+                    				<td class="value"></td>
+                    			</tr>
+                    		</table>` ; 
+                
+                		this.tooltip.html( default_tooltip_content );
+
+                		let mouse = d3.pointer( event );
+
+		                let mouse_y = mouse[1] , mouse_x = mouse[0] - 35 ; 
+
+		                this.tooltip
+		                	.style('top', `${mouse_y}px`)
+                    		.style('left', `${mouse_x}px`)
+                    })
+                    .on("mouseout",(event,d)=>{
+                    	this.tooltip.style('display','none');
+                    });
 
                     this.findRegistry();
 
@@ -238,37 +339,72 @@ export default {
 
   		findRegistry : function(){
 
+  			this.not_found = false ; 
+  			
+  			// this.$router.push({ hash : '#main-nav' }) ; 
+  			$("html, body").animate({ scrollTop: $( '#main-nav' ).offset().top }, 0 );
+
   			this.registry_target = this.registries.find(r=>r.country==this.select_registry) ; 
+
+  			this.registry_target.url = `/registries/${Func.slugify(this.registry_target.label)}/${this.
+  				registry_target.country}/` ; 
+
+  			this.registry_target.report = `${this.path_medias}${this.select_registry}/report.docx` ; 
+
 
   			// this.coordinates = `<span class="badge bg-info text-dark">[${registry_target.geo.lat.toFixed(2)},${registry_target.geo.lng.toFixed(2)}]</span>`;
 
-  			// console.info("=>",this.registry_target) ; 
+  			// console.info(" In map =>",this.registry_target) ; 
   			
   			if (this.registry_target.geo == undefined ) {
   				console.warn(`No geo loc found for ${this.registry_target.geo}`)
+  				this.not_found = true ; 
+
   				return ; 
   			}
 
   			let points = this.registry_target.geo ; 
   			var rotate = this.projection.rotate() ; 
 
-  			// console.info("rotate",rotate) ; 
-
-  			(function transition() {
-		      d3.transition()
-		      	.duration(2500)
-		      	.tween("rotate", () => {
-			        var r = d3.interpolate( this.projection.rotate(), [-points[0], -points[1]]);
+  			let transition_duration = 2500 ; 
+  			// start rotating 
+	      	d3.transition()
+	      		.duration( transition_duration )
+	      		.tween("rotate", () => {
+			        var r = d3.interpolate( this.projection.rotate(), [-points.lng, -points.lat]);
+			        
 			        return (t) => {
+			        	// console.info(t) ; 
 			          	this.projection.rotate(r(t));
-			          	//this.svg.selectAll("path").attr("d", this.path)
+
+			          	// rotate path/land/countries
+			          	this.svg.selectAll("path")
+			          		.attr("d", this.path)
+			          	
+			          	// rotate circle/points.registris
+			          	this.svg_circles.selectAll('circle.registry')
+			          		.attr("cx", (d)=>this.projection([d.geo.lng,d.geo.lat])[0])
+            				.attr("cy", (d)=>this.projection([d.geo.lng,d.geo.lat])[1])
+
 			          	//.classed("focused", function(d, i) { return d.id == focusedCountry.id ? focused = d : false; });
 			        };
-		      })
+			  	});
 
-	      	})();
+	      		// after 
+			  	setTimeout(() => {
 
-  		} , 
+			  		this.svg_circles.selectAll('circle.registry')
+			  			.transition()
+                    	.duration(1250)
+			  			.attr("r",d=>{
+			  				return (d.id==this.registry_target.country)?5:0.5;
+			  			})
+
+			  		$(`circle#circle-25000800`).trigger('mousemove') ; 
+
+			  	}, transition_duration )
+
+  		} // end findRegistry
 
   	}
   
@@ -295,13 +431,30 @@ export default {
 			stroke-width: 0.1px;
 		}
 
-		path.country:hover {
+		circle{
+			display: block ; 
+		}
+
+		/*path.country:hover {
 		  	fill:#33CC33;
 		  	stroke-width: 1px;
 		}
-
 		path.focused {
 		  	fill: #33CC33;
+		}*/
+	}
+}
+
+#registry-info{
+	li{
+		svg{
+			position: absolute;
+			right: 10px;
+		}
+		a{
+			text-decoration: underline;
+			padding-left: 0;
+			margin-left: 0;
 		}
 	}
 }

@@ -28,13 +28,12 @@
 
 				<div class="col-md-9">
 
-					<div class="row" v-if="background!={}">
+					<div class="row" v-if="background!=undefined">
 						<div class="col">
 					    	<div class="card" :id="'chapter-'+background.num_chapter">
 					    		<div class="card-body">
 								    <h5 class="card-title">{{ background.title }}</h5>
-								    <p class="card-text">
-								    	{{ background.text }}
+								    <p class="card-text" v-html="background.text">
 								    </p>
 								</div>
 							</div>
@@ -60,7 +59,8 @@
 					    	</div>
 					    </div>
 					    <div class="col">
-					    	<RegistriesMap v-bind:width="495" v-bind:height="495" v-bind:scale="220" v-bind:hide_selector="true"/>
+
+					    	<RegistriesMap v-bind:width="495" v-bind:height="495" v-bind:scale="220" v-bind:select_registry="population_id" v-bind:hide_selector="true"/>
 					    </div>
 				  	</div>
 
@@ -95,10 +95,12 @@
 							    			
 							    			<div class="row">
 							    				<div class="col">
-								    				<h4>##Horizontal mode</h4>
+								    				<!--<h4>##Horizontal mode</h4>-->
 													<ul class="nav nav-tabs" :id="'tabs-horizontal-link-'+subchapter.num_chapter" role="tablist">
-													  <li class="nav-item"  role="presentation" v-for="(graphic,cpt) in subchapter.graph">
-													    <button :class="{ active: (cpt==0) , 'nav-link' : true }" :id="'h-pills-'+subchapter.num_chapter+'-'+cpt+'-tab'" data-bs-toggle="pill" :data-bs-target="'#h-pills-'+subchapter.num_chapter+'-'+cpt" type="button" role="tab" :aria-controls="'h-pills-'+subchapter.num_chapter+'-'+cpt">Graphic {{ cpt+1 }}</button>
+													  <li class="nav-item" role="presentation" v-for="(graphic,cpt) in subchapter.graph" data-bs-toggle="tooltip" :title="graphic.title">
+													    <button :class="{ active: (cpt==0) , 'nav-link' : true }" :id="'h-pills-'+subchapter.num_chapter+'-'+cpt+'-tab'" data-bs-toggle="pill" :data-bs-target="'#h-pills-'+subchapter.num_chapter+'-'+cpt" type="button" role="tab" :aria-controls="'h-pills-'+subchapter.num_chapter+'-'+cpt">
+													    	<img :src="graphic.picture" class="figure-tab img-tab rounded" :alt="graphic.title">
+													    </button>
 													  </li>
 													</ul>
 													<div class="tab-content" :id="'tabs-horizontal-content-'+subchapter.num_chapter">
@@ -177,7 +179,7 @@ export default {
     		population_id : 0 , 
     		registry_slug : '' , 
     		registry : {} , 
-    		background : {},
+    		background : undefined ,
     		chapter_one : {}, 
     		chapter_two : {},
     		path : `http://gcodev.nanga.iarc.lan/media/iacr/report/`,
@@ -201,7 +203,7 @@ export default {
 	},
 	mounted(){
 
-		this.population_id = parseFloat( this.$route.params.population_id ) ; 
+		this.population_id = reactive( parseFloat( this.$route.params.population_id ) ) ; 
 		this.registry_slug = this.$route.params.registry_slug ; 
 
 		let meta_url = `${this.path}${this.population_id}/meta.json` ; 
@@ -214,7 +216,8 @@ export default {
 
 		    	let navigation = [] ;
 		       	
-		       	console.log("this.registry",this.registry) ; 
+		       	// console.log("this.registry",this.registry) ; 
+		       	console.log("Mounted this.population_id",this.population_id) ; 
 
 		       	if ( this.registry.chapter[0] != undefined ){
 		       		
@@ -222,6 +225,8 @@ export default {
 		       		if ( this.registry.chapter.length >= 3)
 		       		{
 		       			this.background = this.registry.chapter[0] ; 
+
+		       			this.background.text = this.background.text.replace("\n", "<br/>");
 		       			this.chapter_one = this.registry.chapter[1] ; 
 			       		this.chapter_one = this.setGraphicPath( this.chapter_one ) ; 
 
@@ -274,6 +279,9 @@ export default {
 		       	}); 
 
 		       	setTimeout(()=>{
+
+					$('[data-bs-toggle="tooltip"]').tooltip();
+			       	
 			       	this.left_navigation.forEach( n => {
 			       		// console.info("===>",n) ; 
 			       		let waypoint = new Waypoint({
@@ -423,6 +431,10 @@ export default {
 
 			}
 		}
+	}
+
+	img.img-tab{
+		max-width: 50px;
 	}
 }
 
